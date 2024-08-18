@@ -43,8 +43,8 @@ def load_env():
     # Check all dependencies
     if not check_ffmpeg_installed():
         raise EnvironmentError("ffmpeg is not installed")
-    if not check_process_running("gentle"):
-        raise EnvironmentError("gentle aligner is not running")
+    # if not check_process_running("gentle") and not os.getenv("DOCKER"):
+    #     raise EnvironmentError("gentle aligner is not running")
 
     # Check required fonts
     font_names = ["Poppins-SemiBold.tff", "Mont"]
