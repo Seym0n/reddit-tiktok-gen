@@ -372,17 +372,28 @@ def parse_srt_time(time_str: str) -> float:
     seconds, milliseconds = seconds.split(',')
     return int(hours) * 3600 + int(minutes) * 60 + int(seconds) + int(milliseconds) / 1000
 
-def create_animated_ass(srt_path: str, ass_path: str):
+def get_video_dimensions(video_path):
+    """Get the dimensions of the input video."""
+    probe = ffmpeg.probe(video_path)
+    video_info = next(s for s in probe['streams'] if s['codec_type'] == 'video')
+    width = int(video_info['width'])
+    height = int(video_info['height'])
+    return width, height
+
+def create_animated_ass(srt_path: str, ass_path: str, video_path: str):
     """Convert SRT to ASS with improved font, stronger outline, and bounce effect."""
-    ass_header = """[Script Info]
+    width, height = get_video_dimensions(video_path)
+    fontsize = (int)((width / 606) * 60)
+
+    ass_header = f"""[Script Info]
 ScriptType: v4.00+
-PlayResX: 606
-PlayResY: 1080
+PlayResX: {width}
+PlayResY: {height}
 ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Alignment, Outline, Shadow
-Style: Default,Mont,60,&H00FFFFFF,&H000000FF,&H00000000,&H80000000,1,0,5,3,0
+Style: Default,Mont,{fontsize},&H00FFFFFF,&H000000FF,&H00000000,&H80000000,1,0,5,3,0
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -467,7 +478,7 @@ def embed_srt_and_audio(
 
     # Create ASS file with animated subtitles
     ass_path = os.path.splitext(srt_path)[0] + '.ass'
-    create_animated_ass(srt_path, ass_path)
+    create_animated_ass(srt_path, ass_path, video_path)
 
     subtitles_filter = f"ass={ass_path}"
     

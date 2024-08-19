@@ -54,7 +54,7 @@ def load_env():
             pass
             # raise EnvironmentError(f"Font {font} is not installed")
 
-    log.info(f"Running in {os.getenv("ENV")}")
+    # log.info(f"Running in {os.getenv("ENV")}")
 
 
 ffmpeg_config = {

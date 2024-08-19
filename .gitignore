@@ -6,6 +6,7 @@ media/
 ignore/
 .DS_Store
 assets/minecraft*
+assets/*.mp4
 *.db
 scripts/output
 .idea
