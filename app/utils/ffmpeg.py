@@ -490,7 +490,7 @@ def embed_srt_and_audio(
                 output_path,
                 vf=subtitles_filter,
                 vcodec="libx264",
-                acodec="libmp3lame",
+                acodec="aac",
                 # Quality optimizations
                 audio_bitrate="192k",
                 crf=20,
