@@ -13,7 +13,7 @@ def determine_gender_from_text(text: str) -> str:
 
     try:
         completion = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=[
                 {
                     "role": "system",
@@ -49,7 +49,7 @@ def improve_content_from_text(text: str) -> str:
 
     try:
         response = openai.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o-mini",
             messages=[
                 {
                     "role": "system",

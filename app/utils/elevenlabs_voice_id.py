@@ -1,3 +1,3 @@
 class ElevenLabsVoiceId:
-    DEEP_MALE = "Fv2pBT28fdbc0Wcg4WHX"
-    SOFT_FEMALE = "WEw1GNaiYHxgo6LGjOWa"
+    DEEP_MALE = "pNInz6obpgDQGcFmaJgB"
+    SOFT_FEMALE = "pFZP5JQG7iQjIQuC4Bku"

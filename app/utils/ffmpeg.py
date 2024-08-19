@@ -1,8 +1,9 @@
 import ffmpeg
 import math
 import os
+import re
 
-from typing import cast
+from typing import cast, List, Tuple
 
 from app.config import ffmpeg_config
 
@@ -365,6 +366,75 @@ def buffer_audio(audio_path: str, pos: str, duration: float, output_path: str):
         )
 
 
+def parse_srt_time(time_str: str) -> float:
+    """Convert SRT time format to seconds."""
+    hours, minutes, seconds = time_str.split(':')
+    seconds, milliseconds = seconds.split(',')
+    return int(hours) * 3600 + int(minutes) * 60 + int(seconds) + int(milliseconds) / 1000
+
+def create_animated_ass(srt_path: str, ass_path: str):
+    """Convert SRT to ASS with improved font, stronger outline, and bounce effect."""
+    ass_header = """[Script Info]
+ScriptType: v4.00+
+PlayResX: 606
+PlayResY: 1080
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Alignment, Outline, Shadow
+Style: Default,Mont,60,&H00FFFFFF,&H000000FF,&H00000000,&H80000000,1,0,5,3,0
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+"""
+    
+    def time_to_ass(time_str):
+        h, m, s = time_str.replace(',', '.').split(':')
+        return f"{int(h):01d}:{int(m):02d}:{float(s):.2f}"
+
+    with open(srt_path, 'r', encoding='utf-8') as srt_file, open(ass_path, 'w', encoding='utf-8') as ass_file:
+        ass_file.write(ass_header)
+        
+        srt_content = srt_file.read()
+        subtitle_blocks = re.split(r'\n\n+', srt_content.strip())
+        
+        for i, block in enumerate(subtitle_blocks):
+            lines = block.split('\n')
+            if len(lines) >= 3:
+                index = lines[0]
+                timing = lines[1]
+                text = ' '.join(lines[2:])  # Join all text lines
+                
+                start_time, end_time = timing.split(' --> ')
+                start_time_ass = time_to_ass(start_time)
+                end_time_ass = time_to_ass(end_time)
+                
+                # Calculate duration for timing the bounce effect
+                start_seconds = sum(float(x) * 60 ** i for i, x in enumerate(reversed(start_time.replace(',', '.').split(':'))))
+                end_seconds = sum(float(x) * 60 ** i for i, x in enumerate(reversed(end_time.replace(',', '.').split(':'))))
+                duration = end_seconds - start_seconds
+                
+                # Bounce effect with fade in/out
+                bounce_duration = min(duration * 0.3, 0.6)  # 30% of duration or max 600ms
+                fade_duration = min(duration * 0.1, 0.2)  # 10% of duration or max 200ms for fade
+                
+                animation = (
+                    "{\\fad(%(fade)d,%(fade)d)"  # Fade in and out
+                    "\\t(0,%(bounce)d,\\fscx120\\fscy120)"  # Grow to 120%
+                    "\\t(%(bounce)d,%(bounce_end)d,\\fscx100\\fscy100)}"  # Shrink back to 100%
+                ) % {
+                    'fade': int(fade_duration * 1000),
+                    'bounce': int(bounce_duration * 1000),
+                    'bounce_end': int(bounce_duration * 1500)  # 1.5x bounce duration for the shrink
+                }
+                
+                ass_line = f"Dialogue: 0,{start_time_ass},{end_time_ass},Default,,0,0,0,,{animation}{text}\n"
+                ass_file.write(ass_line)
+                
+                print(f"Subtitle {index}: {start_time_ass} -> {end_time_ass}: {text}")  # Debug print
+
+    print(f"ASS file created at: {ass_path}")  # Debug print
+
 def embed_srt_and_audio(
     video_path: str,
     audio_path: str,
@@ -373,7 +443,7 @@ def embed_srt_and_audio(
     config_preset="default",
 ):
     """
-    Embeds subtitles and audio into a video file using FFmpeg.
+    Embeds animated subtitles and audio into a video file using FFmpeg.
 
     Args:
         video_path (str): The path to the input video file.
@@ -386,7 +456,7 @@ def embed_srt_and_audio(
         FFMpegProcessingError: If an error occurs during the FFmpeg command execution.
     """
 
-    log.info("Embedding subtitles and audio...")
+    log.info("Embedding animated subtitles and audio...")
     log.debug("Video path: %s", video_path)
     log.debug("Audio path: %s", audio_path)
     log.debug("SRT path: %s", srt_path)
@@ -395,7 +465,12 @@ def embed_srt_and_audio(
     settings = ffmpeg_config.get(config_preset, ffmpeg_config["default"])
     log.debug("FFmpeg settings: %s", settings)
 
-    subtitles_filter = f"subtitles={srt_path}:force_style='FontName=Mont,FontSize=18,PrimaryColour=&H00ffffff,OutlineColour=&H00000000,BackColour=&H80000000,Bold=1,Italic=0,Alignment=10,Outline=1.5'"
+    # Create ASS file with animated subtitles
+    ass_path = os.path.splitext(srt_path)[0] + '.ass'
+    create_animated_ass(srt_path, ass_path)
+
+    subtitles_filter = f"ass={ass_path}"
+    
     try:
         (
             ffmpeg.input(video_path)
@@ -421,7 +496,10 @@ def embed_srt_and_audio(
         raise FFMpegProcessingError(
             "Error during embed_srt_and_audio ffmpeg command", stderr=e.stderr
         )
-
+    finally:
+        # Clean up the temporary ASS file
+        if os.path.exists(ass_path):
+            os.remove(ass_path)
 
 def delay_srt(srt_path: str, delay: float, output_path: str):
     """
