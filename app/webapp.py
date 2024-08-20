@@ -53,12 +53,17 @@ async def post_root(
     post_title: str = Form(...),
     post_content: str = Form(...),
     background_video: str = Form(...),
+    password: str = Form(...),
     db: AsyncSession = Depends(get_db_session),
 ):
     log.info("Received a video generation request")
     log.debug(f"Title: {post_title}")
     log.debug(f"Content: {post_content}")
     log.debug(f"Background Video: {background_video}")
+
+    if password != os.getenv("PASSWORD"):
+        log.error("Invalid password")
+        return JSONResponse(content={"error": "Invalid password"}, status_code=401)
 
     if len(post_title) > 125:
         log.error("Title is too long. Max 124 Characters.")
@@ -73,7 +78,7 @@ async def post_root(
         output_dir = os.path.join("tmp", str(job.id))
         os.makedirs(output_dir, exist_ok=True)
 
-        background_video = os.path.join("assets", "minecraft_background_video_1.mp4")
+        background_video = os.path.join("assets", background_video)
 
         generate_video.delay(
             job.id, post_title, post_content, background_video, output_dir

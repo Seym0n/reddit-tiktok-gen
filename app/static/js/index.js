@@ -3,10 +3,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const post_content = document.getElementById('post_content');
     const background_video = document.getElementById('background_video');
     const generate_btn = document.getElementById('generate-btn');
+    const password = document.getElementById('password');
 
     // Load data from local storage on load
     post_title.value = localStorage.getItem('post_title');
     post_content.value = localStorage.getItem('post_content');
+    password.value = localStorage.getItem('password');
     if (localStorage.getItem('background_video') === null) {
         background_video.value = 'Select a base background video';
     } else {
@@ -24,5 +26,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     background_video.addEventListener('change', function() {
         localStorage.setItem('background_video', background_video.value);
+    })
+
+    password.addEventListener('change', function() {
+        localStorage.setItem('password', password.value);
     })
 })

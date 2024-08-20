@@ -22,6 +22,11 @@ sudo fc-cache -fv
 
 # Copy background media file(s) to the remote machine
 scp ./assets/minecraft_background_video_1.mp4 user@host:/root/reddit-tiktok-gen/assets/
+scp ./assets/subwaysurfer_background_video_1.mp4 user@host:/root/reddit-tiktok-gen/assets/
+scp ./assets/templerun_background_video_1.mp4 user@host:/root/reddit-tiktok-gen/assets/
+scp ./assets/railrush_background_video_1.mp4 user@host:/root/reddit-tiktok-gen/assets/
+scp ./assets/zombierun_background_video_1.mp4 user@host:/root/reddit-tiktok-gen/assets/
+
 
 # Copy output files to local machine
 mkdir ./ssh-output
