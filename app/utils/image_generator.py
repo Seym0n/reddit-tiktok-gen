@@ -39,7 +39,7 @@ def generate_title_image(output_path: str, title: str):
     font_path = os.path.join(current_dir, '..', '..', 'assets', 'Ubuntu-Medium.ttf')
 
     try:
-        font = ImageFont.truetype(font_path, 34)
+        font = ImageFont.truetype(font_path, 38)
     except Exception as e:
         raise ValueError(f"Error loading font: {e}")
 
@@ -52,7 +52,7 @@ def generate_title_image(output_path: str, title: str):
 
     color = "rgb(0,0,0)"
 
-    lines = textwrap.wrap(title, width=47)
+    lines = textwrap.wrap(title, width=46)
 
     for line in lines:
         bbox = draw.textbbox((0, 0), line, font=font)

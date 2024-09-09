@@ -393,7 +393,7 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Alignment, Outline, Shadow
-Style: Default,Mont,{fontsize},&H00FFFFFF,&H000000FF,&H00000000,&H80000000,1,0,5,3,0
+Style: Default,Mont,{fontsize},&H00FFFFFF,&H000000FF,&H00000000,&H80000000,1,0,5,6,0
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text

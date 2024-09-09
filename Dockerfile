@@ -26,6 +26,7 @@ COPY ./.env-docker /app/
 
 # Copy font files
 COPY ./assets/Poppins-SemiBold.ttf /usr/share/fonts/
+COPY ./assets/Ubuntu-Medium.ttf /usr/share/fonts/
 COPY ./assets/Mont-HeavyDEMO.otf /usr/share/fonts/
 
 # Update font cache

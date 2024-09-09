@@ -47,7 +47,7 @@ def load_env():
     #     raise EnvironmentError("gentle aligner is not running")
 
     # Check required fonts
-    font_names = ["Poppins-SemiBold.tff", "Mont"]
+    font_names = ["Poppins-SemiBold.tff", "Mont", "Ubuntu-Medium.ttf"]
     installed_fonts = check_fonts_installed(font_names)
     for font, installed in installed_fonts.items():
         if not installed:
