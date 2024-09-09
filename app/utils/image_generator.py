@@ -17,9 +17,9 @@ def generate_title_image(output_path: str, title: str):
     Returns:
         None
     """
-    if len(title) > 125:
+    if len(title) > 175:
         raise ValueError(
-            "Title is too long. Max 124 Characters. This is due to restrictions on the title image template."
+            "Title is too long. Max 175 Characters. This is due to restrictions on the title image template."
         )
 
     title = title.strip()
@@ -33,21 +33,26 @@ def generate_title_image(output_path: str, title: str):
 
     draw = ImageDraw.Draw(image)
 
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Navigate to the correct font path
+    font_path = os.path.join(current_dir, '..', '..', 'assets', 'Ubuntu-Medium.ttf')
+
     try:
-        font = ImageFont.truetype("Poppins-SemiBold.ttf", 34)
+        font = ImageFont.truetype(font_path, 34)
     except Exception as e:
         raise ValueError(f"Error loading font: {e}")
 
-    x = 400
+    x = 365
     y = 745
-    if len(title) < 80:
-        y = 765
+    if len(title) < 85:
+        y = 795
 
-    line_height = 40
+    line_height = 45
 
     color = "rgb(0,0,0)"
 
-    lines = textwrap.wrap(title, width=43)
+    lines = textwrap.wrap(title, width=47)
 
     for line in lines:
         bbox = draw.textbbox((0, 0), line, font=font)
